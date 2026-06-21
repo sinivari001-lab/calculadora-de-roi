@@ -777,14 +777,10 @@ tr.row-loss td:first-child { padding-left: 5px; }
         <span style="color:var(--text3);font-size:0.72rem;" id="filter-info"></span>
       </div>
       <div class="toolbar-group" style="border-color:rgba(108,92,231,0.25);background:rgba(108,92,231,0.04);">
-        <span class="toolbar-group-label" style="color:var(--purple);">Nivel Vendedor</span>
-        <select id="sellerLevel" onchange="changeSellerLevel(this.value)" style="padding:3px 6px;background:var(--surface2);border:1px solid rgba(108,92,231,0.4);border-radius:4px;color:var(--purple);font-size:0.75rem;font-weight:600;">
-          <option value="normal">Normal (0pp)</option>
-          <option value="lider">MercadoLider (-1pp)</option>
-          <option value="gold">ML Gold (-1,5pp)</option>
-          <option value="platinum">ML Platinum (-2pp)</option>
+        <span class="toolbar-group-label" style="color:var(--purple);">Categoria ML</span>
+        <select id="globalCategory" onchange="changeCategory(this.value)" style="padding:3px 6px;background:var(--surface2);border:1px solid rgba(108,92,231,0.4);border-radius:4px;color:var(--purple);font-size:0.72rem;font-weight:600;max-width:280px;">
         </select>
-        <span id="sellerDiscountInfo" style="font-size:0.65rem;color:var(--text3);"></span>
+        <button class="btn" onclick="changeCategory(document.getElementById('globalCategory').value)" style="font-size:0.62rem;padding:3px 6px;color:var(--purple);border-color:rgba(108,92,231,0.3);">Aplicar a Todos</button>
       </div>
       <div class="toolbar-group" style="border-color:rgba(255,179,71,0.25);background:rgba(255,179,71,0.04);">
         <span class="toolbar-group-label" style="color:var(--yellow);">Imposto</span>
@@ -886,6 +882,7 @@ tr.row-loss td:first-child { padding-left: 5px; }
           <th onclick="sortBy('revenue')" class="right sortable">Fat/Mes</th>
           <th onclick="sortBy('price')" class="right sortable">Preco Medio</th>
           <th class="right">Tipo Anuncio</th>
+          <th class="right">Categoria</th>
           <th class="right">Taxa Fixa R$</th>
           <th class="right">Imposto %</th>
           <!--<th onclick="sortBy('weight')" class="right sortable" title="Peso em gramas">Peso (g)</th>-->
@@ -922,9 +919,13 @@ tr.row-loss td:first-child { padding-left: 5px; }
       <div class="field">
         <label>Tipo de Anuncio</label>
         <select id="calc_listing_type" onchange="calcFees()">
-          <option value="premium">Premium (16,5%)</option>
-          <option value="classico">Classico (11,5%)</option>
+          <option value="premium">Premium</option>
+          <option value="classico">Classico</option>
         </select>
+      </div>
+      <div class="field">
+        <label>Categoria</label>
+        <select id="calc_category" onchange="calcFees()" style="font-size:0.75rem;"></select>
       </div>
       <div class="field">
         <label>Frete (R$)</label>
@@ -962,16 +963,42 @@ tr.row-loss td:first-child { padding-left: 5px; }
           </tr>
         </thead>
         <tbody>
-          <tr><td>Celulares / Informatica / Consoles</td><td class="right">11%</td><td class="right">16%</td></tr>
-          <tr style="background:rgba(0,229,176,0.08);"><td><b>Festas / Brinquedos / Papelaria</b></td><td class="right"><b>11,5%</b></td><td class="right"><b>16,5%</b></td></tr>
-          <tr><td>Moveis / Decoracao / Eletrodomesticos</td><td class="right">12%</td><td class="right">17%</td></tr>
-          <tr><td>Joias / Pet Shop</td><td class="right">12,5%</td><td class="right">17,5%</td></tr>
-          <tr><td>Eletronicos / Audio / Games</td><td class="right">13%</td><td class="right">18%</td></tr>
-          <tr><td>Moda / Beleza / Esportes / Alimentos</td><td class="right">14%</td><td class="right">19%</td></tr>
+          <tr style="background:rgba(0,229,176,0.05);"><td colspan="3" style="font-weight:700;color:var(--accent);font-size:0.72rem;padding:6px 8px;">11% / 16%</td></tr>
+          <tr><td>Celulares e Smartphones</td><td class="right">11%</td><td class="right">16%</td></tr>
+          <tr><td>Informatica</td><td class="right">11%</td><td class="right">16%</td></tr>
+          <tr><td>Cameras e Acessorios</td><td class="right">11%</td><td class="right">16%</td></tr>
+          <tr><td>Eletrodomesticos</td><td class="right">11%</td><td class="right">16%</td></tr>
+          <tr style="background:rgba(0,229,176,0.05);"><td colspan="3" style="font-weight:700;color:var(--accent);font-size:0.72rem;padding:6px 8px;">11,5% / 16,5%</td></tr>
+          <tr><td>Agro</td><td class="right">11,5%</td><td class="right">16,5%</td></tr>
+          <tr><td>Antiguidades e Colecoes</td><td class="right">11,5%</td><td class="right">16,5%</td></tr>
+          <tr><td>Arte, Papelaria e Armarinho</td><td class="right">11,5%</td><td class="right">16,5%</td></tr>
+          <tr><td>Brinquedos e Hobbies</td><td class="right">11,5%</td><td class="right">16,5%</td></tr>
+          <tr><td>Casa, Moveis e Decoracao</td><td class="right">11,5%</td><td class="right">16,5%</td></tr>
+          <tr><td>Construcao</td><td class="right">11,5%</td><td class="right">16,5%</td></tr>
+          <tr><td>Festas e Lembrancinhas</td><td class="right">11,5%</td><td class="right">16,5%</td></tr>
+          <tr><td>Ingressos</td><td class="right">11,5%</td><td class="right">16,5%</td></tr>
+          <tr><td>Instrumentos Musicais</td><td class="right">11,5%</td><td class="right">16,5%</td></tr>
+          <tr style="background:rgba(0,229,176,0.05);"><td colspan="3" style="font-weight:700;color:var(--accent);font-size:0.72rem;padding:6px 8px;">12% / 17%</td></tr>
+          <tr><td>Acessorios para Veiculos</td><td class="right">12%</td><td class="right">17%</td></tr>
+          <tr><td>Industria e Comercio</td><td class="right">12%</td><td class="right">17%</td></tr>
+          <tr><td>Livros, Revistas e Comics</td><td class="right">12%</td><td class="right">17%</td></tr>
+          <tr><td>Musica, Filmes e Seriados</td><td class="right">12%</td><td class="right">17%</td></tr>
+          <tr><td>Saude</td><td class="right">12%</td><td class="right">17%</td></tr>
+          <tr style="background:rgba(0,229,176,0.05);"><td colspan="3" style="font-weight:700;color:var(--accent);font-size:0.72rem;padding:6px 8px;">12,5% / 17,5%</td></tr>
+          <tr><td>Joias e Relogios</td><td class="right">12,5%</td><td class="right">17,5%</td></tr>
+          <tr><td>Pet Shop</td><td class="right">12,5%</td><td class="right">17,5%</td></tr>
+          <tr style="background:rgba(0,229,176,0.05);"><td colspan="3" style="font-weight:700;color:var(--accent);font-size:0.72rem;padding:6px 8px;">13% / 18%</td></tr>
+          <tr><td>Eletronicos, Audio e Video</td><td class="right">13%</td><td class="right">18%</td></tr>
+          <tr><td>Games</td><td class="right">13%</td><td class="right">18%</td></tr>
+          <tr style="background:rgba(0,229,176,0.05);"><td colspan="3" style="font-weight:700;color:var(--accent);font-size:0.72rem;padding:6px 8px;">14% / 19%</td></tr>
+          <tr><td>Alimentos e Bebidas</td><td class="right">14%</td><td class="right">19%</td></tr>
+          <tr><td>Bebes</td><td class="right">14%</td><td class="right">19%</td></tr>
+          <tr><td>Beleza e Cuidado Pessoal</td><td class="right">14%</td><td class="right">19%</td></tr>
+          <tr><td>Esportes e Fitness</td><td class="right">14%</td><td class="right">19%</td></tr>
+          <tr><td>Calcados, Roupas e Bolsas</td><td class="right">14%</td><td class="right">19%</td></tr>
         </tbody>
       </table>
       <p style="font-size:0.72rem;color:var(--text3);margin-top:6px;">Taxa fixa: R$6,25-R$6,75 (ate R$79) | R$0 (acima de R$79) | 50% (abaixo de R$12,50)</p>
-      <p style="font-size:0.72rem;color:var(--purple);margin-top:4px;">Desconto MercadoLider: ate -2pp na comissao (Platinum). Selecione seu nivel na toolbar acima.</p>
     </div>
   </div>
 
@@ -990,9 +1017,13 @@ tr.row-loss td:first-child { padding-left: 5px; }
       <div class="field">
         <label>Tipo de Anuncio</label>
         <select id="sim_listing_type" onchange="calcIdealPrice()">
-          <option value="premium">Premium (16,5%)</option>
-          <option value="classico">Classico (11,5%)</option>
+          <option value="premium">Premium</option>
+          <option value="classico">Classico</option>
         </select>
+      </div>
+      <div class="field">
+        <label>Categoria</label>
+        <select id="sim_category" onchange="calcIdealPrice()" style="font-size:0.75rem;"></select>
       </div>
       <div class="field">
         <label>Imposto (%)</label>
@@ -1054,6 +1085,63 @@ tr.row-loss td:first-child { padding-left: 5px; }
     <button class="btn btn-accent" onclick="addCompetitor()">+ Concorrente</button>
   </div>
   <div class="card-grid" id="competitorGrid"></div>
+</div>
+
+<!-- Mural de Atualizacoes -->
+<div style="max-width:700px;margin:30px auto 0;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;animation:fadeInUp 0.5s ease-out both;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;background:linear-gradient(135deg,#00e5b0,#00c99a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Mural de Atualizacoes</span>
+    </div>
+    <span style="font-size:0.68rem;font-weight:700;padding:3px 10px;border-radius:6px;background:rgba(0,229,176,0.12);color:var(--accent);letter-spacing:0.5px;">v1.5.0</span>
+  </div>
+  <div style="max-height:300px;overflow-y:auto;font-size:0.75rem;line-height:1.8;">
+    <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(42,42,62,0.3);">
+      <span style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:0.65rem;min-width:72px;">20/06/26</span>
+      <span style="color:var(--green);font-weight:700;font-size:0.6rem;min-width:40px;">NOVO</span>
+      <span style="color:var(--text2);">Taxas por categoria ML &mdash; 6 faixas reais de comissao (11% a 19%) aplicadas automaticamente na calculadora, simulador e tabela de produtos</span>
+    </div>
+    <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(42,42,62,0.3);">
+      <span style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:0.65rem;min-width:72px;">19/06/26</span>
+      <span style="color:var(--green);font-weight:700;font-size:0.6rem;min-width:40px;">NOVO</span>
+      <span style="color:var(--text2);">Deploy na nuvem (Vercel) &mdash; acesse de qualquer lugar, compartilhe com amigos e clientes</span>
+    </div>
+    <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(42,42,62,0.3);">
+      <span style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:0.65rem;min-width:72px;">18/06/26</span>
+      <span style="color:var(--green);font-weight:700;font-size:0.6rem;min-width:40px;">NOVO</span>
+      <span style="color:var(--text2);">Tour interativo &ldquo;Dicas de Ouro&rdquo; &mdash; guia passo a passo com 8 dicas para usar o PreciFy como um profissional</span>
+    </div>
+    <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(42,42,62,0.3);">
+      <span style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:0.65rem;min-width:72px;">17/06/26</span>
+      <span style="color:var(--green);font-weight:700;font-size:0.6rem;min-width:40px;">NOVO</span>
+      <span style="color:var(--text2);">Supabase Auth + Cloud Sync &mdash; faca login, salve seus produtos na nuvem e acesse de qualquer dispositivo</span>
+    </div>
+    <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(42,42,62,0.3);">
+      <span style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:0.65rem;min-width:72px;">16/06/26</span>
+      <span style="color:var(--green);font-weight:700;font-size:0.6rem;min-width:40px;">NOVO</span>
+      <span style="color:var(--text2);">Aba Concorrentes &mdash; adicione concorrentes, compare precos, margens e vendas lado a lado</span>
+    </div>
+    <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(42,42,62,0.3);">
+      <span style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:0.65rem;min-width:72px;">16/06/26</span>
+      <span style="color:var(--green);font-weight:700;font-size:0.6rem;min-width:40px;">NOVO</span>
+      <span style="color:var(--text2);">Simulador de Preco Ideal &mdash; defina margem desejada e descubra o preco exato para atingi-la</span>
+    </div>
+    <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(42,42,62,0.3);">
+      <span style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:0.65rem;min-width:72px;">15/06/26</span>
+      <span style="color:var(--green);font-weight:700;font-size:0.6rem;min-width:40px;">NOVO</span>
+      <span style="color:var(--text2);">Calculadora de Taxas ML &mdash; tabela completa de taxas Premium vs Classico por categoria</span>
+    </div>
+    <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(42,42,62,0.3);">
+      <span style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:0.65rem;min-width:72px;">15/06/26</span>
+      <span style="color:var(--green);font-weight:700;font-size:0.6rem;min-width:40px;">NOVO</span>
+      <span style="color:var(--text2);">Importacao automatica via link ML &mdash; cole o link do anuncio e os dados sao preenchidos automaticamente</span>
+    </div>
+    <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(42,42,62,0.3);">
+      <span style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:0.65rem;min-width:72px;">14/06/26</span>
+      <span style="color:var(--accent);font-weight:700;font-size:0.6rem;min-width:40px;">LANC.</span>
+      <span style="color:var(--text);">Lancamento do PreciFy &mdash; calculadora de ROI com analise de margem, custos ML, frete e impostos para vendedores Mercado Livre</span>
+    </div>
+  </div>
 </div>
 
 <div class="brand-footer">
@@ -1262,21 +1350,58 @@ function fmtR(n) { return isNaN(n) || !isFinite(n) ? '-' : 'R$ ' + fmt(n); }
 // ============================================================
 const STORAGE_KEY = 'precify-products';
 const SUPA_TABLE = 'precify_products';
+const ML_CATEGORIES = {
+  'acess-veiculos':   { label: 'Acessorios para Veiculos',      classico: 12, premium: 17 },
+  'agro':             { label: 'Agro',                          classico: 11.5, premium: 16.5 },
+  'alimentos':        { label: 'Alimentos e Bebidas',           classico: 14, premium: 19 },
+  'antiguidades':     { label: 'Antiguidades e Colecoes',       classico: 11.5, premium: 16.5 },
+  'ar-condicionado':  { label: 'Ar-Condicionado',              classico: 11, premium: 16 },
+  'arte':             { label: 'Arte, Papelaria e Armarinho',   classico: 11.5, premium: 16.5 },
+  'bebes':            { label: 'Bebes',                         classico: 14, premium: 19 },
+  'beleza':           { label: 'Beleza e Cuidado Pessoal',      classico: 14, premium: 19 },
+  'brinquedos':       { label: 'Brinquedos e Hobbies',          classico: 11.5, premium: 16.5 },
+  'moda':             { label: 'Calcados, Roupas e Bolsas',     classico: 14, premium: 19 },
+  'cameras':          { label: 'Cameras e Acessorios',          classico: 11, premium: 16 },
+  'camisas-futebol':  { label: 'Camisas de Futebol',           classico: 11.5, premium: 16.5 },
+  'casa':             { label: 'Casa, Moveis e Decoracao',      classico: 11.5, premium: 16.5 },
+  'celulares':        { label: 'Celulares e Smartphones',       classico: 11, premium: 16 },
+  'construcao':       { label: 'Construcao',                    classico: 11.5, premium: 16.5 },
+  'cuidado-facial':   { label: 'Cuidado Facial',               classico: 12, premium: 17 },
+  'eletrodomesticos': { label: 'Eletrodomesticos',              classico: 11, premium: 16 },
+  'eletronicos':      { label: 'Eletronicos, Audio e Video',    classico: 13, premium: 18 },
+  'esportes':         { label: 'Esportes e Fitness',            classico: 14, premium: 19 },
+  'ferramentas':      { label: 'Ferramentas',                  classico: 11.5, premium: 16.5 },
+  'festas':           { label: 'Festas e Lembrancinhas',        classico: 11.5, premium: 16.5 },
+  'games':            { label: 'Games',                         classico: 13, premium: 18 },
+  'impressoras':      { label: 'Impressoras e Acessorios',     classico: 11, premium: 16 },
+  'industria':        { label: 'Industria e Comercio',          classico: 12, premium: 17 },
+  'informatica':      { label: 'Informatica',                   classico: 11, premium: 16 },
+  'ingressos':        { label: 'Ingressos',                     classico: 11.5, premium: 16.5 },
+  'instrumentos':     { label: 'Instrumentos Musicais',         classico: 11.5, premium: 16.5 },
+  'joias':            { label: 'Joias e Relogios',              classico: 12.5, premium: 17.5 },
+  'livros':           { label: 'Livros, Revistas e Comics',     classico: 12, premium: 17 },
+  'mochilas':         { label: 'Mochilas e Malas',              classico: 12, premium: 17 },
+  'musica':           { label: 'Musica, Filmes e Seriados',     classico: 12, premium: 17 },
+  'petshop':          { label: 'Pet Shop',                      classico: 12.5, premium: 17.5 },
+  'pneus':            { label: 'Pneus e Acessorios',           classico: 11.5, premium: 16.5 },
+  'racao':            { label: 'Racao e Alimentos Pet',         classico: 14, premium: 19 },
+  'relogios':         { label: 'Relogios',                     classico: 12.5, premium: 17.5 },
+  'saude':            { label: 'Saude',                         classico: 12, premium: 17 },
+  'suplementos':      { label: 'Suplementos Alimentares',      classico: 12, premium: 17 },
+  'tablets':          { label: 'Tablets e Acessorios',          classico: 11, premium: 16 }
+};
+const DEFAULT_CATEGORY = 'agro';
+function getCategoryFee(catKey, listingType) {
+  const cat = ML_CATEGORIES[catKey] || ML_CATEGORIES[DEFAULT_CATEGORY];
+  return listingType === 'classico' ? cat.classico : cat.premium;
+}
+function getCategoryOptions() {
+  return Object.entries(ML_CATEGORIES).map(([k, v]) => `<option value="${k}">${v.label} (${v.classico}% / ${v.premium}%)</option>`).join('');
+}
 const ML_LISTING = {
   premium:  { label: 'Premium',  fee: 16.5, fixed: 6 },
   classico: { label: 'Clássico', fee: 11.5, fixed: 6 }
 };
-const SELLER_LEVEL = {
-  normal:   { label: 'Normal',              discount: 0 },
-  lider:    { label: 'MercadoLíder',        discount: 1 },
-  gold:     { label: 'MercadoLíder Gold',   discount: 1.5 },
-  platinum: { label: 'MercadoLíder Platinum',discount: 2 }
-};
-function getSellerDiscount() {
-  const sel = document.getElementById('sellerLevel');
-  const lvl = sel ? sel.value : (localStorage.getItem('precify-seller-level') || 'normal');
-  return (SELLER_LEVEL[lvl] || SELLER_LEVEL.normal).discount;
-}
 function mlFixedFee(price) {
   if (price >= 79) return 0;
   if (price >= 55) return 6.75;
@@ -1402,8 +1527,10 @@ function switchTab(tab) {
 // PRODUCT TABLE
 // ============================================================
 function recalcProduct(p) {
-  if (p.listingType && ML_LISTING[p.listingType]) {
-    p.mlFee = Math.max(0, ML_LISTING[p.listingType].fee - getSellerDiscount());
+  if (p.listingType) {
+    const catKey = p.category || document.getElementById('globalCategory')?.value || DEFAULT_CATEGORY;
+    p.mlFee = getCategoryFee(catKey, p.listingType);
+    if (!p.category) p.category = catKey;
   }
   p.fixedFee = mlFixedFee(p.price || 0);
   const mlFeeVal = (p.price || 0) * ((p.mlFee || 0) / 100);
@@ -1488,9 +1615,12 @@ function renderProducts() {
       <td class="right mono" style="color:var(--green);font-weight:600;" title="Vendas/Dia × Preco">${p.revenuePerDay > 0 ? fmtR(p.revenuePerDay) : '-'}</td>
       <td class="right mono">${fmtR(p.revenue)}</td>
       <td class="right"><input class="narrow" type="number" value="${p.price}" step="0.01" onchange="upd(${idx},'price',+this.value)"></td>
-      <td class="right"><select onchange="updListingType(${idx},this.value)" style="width:90px;color:var(--orange);background:var(--bg2);border:1px solid var(--border);padding:2px 4px;border-radius:4px;font-size:0.78rem;" title="Taxa efetiva: ${fmtPct(p.mlFee)}">
+      <td class="right"><select onchange="updListingType(${idx},this.value)" style="width:90px;color:var(--orange);background:var(--bg2);border:1px solid var(--border);padding:2px 4px;border-radius:4px;font-size:0.78rem;">
         <option value="premium" ${(p.listingType||'premium')==='premium'?'selected':''}>Premium</option>
         <option value="classico" ${(p.listingType||'premium')==='classico'?'selected':''}>Classico</option>
+      </select><div style="font-size:0.65rem;margin-top:2px;color:var(--text3);">${fmtPct(p.mlFee)}</div></td>
+      <td class="right"><select onchange="updCategory(${idx},this.value)" style="width:120px;color:var(--purple);background:var(--bg2);border:1px solid rgba(108,92,231,0.3);padding:2px 4px;border-radius:4px;font-size:0.7rem;">
+        ${Object.entries(ML_CATEGORIES).map(([k,v]) => `<option value="${k}" ${(p.category||DEFAULT_CATEGORY)===k?'selected':''}>${v.label.split(' / ')[0]} (${v.classico}%/${v.premium}%)</option>`).join('')}
       </select></td>
       <td class="right mono" style="color:var(--orange);" title="R$0 acima de R$79">${fmtR(p.fixedFee||0)}</td>
       <td class="right"><input class="narrow" type="number" value="${p.taxPct}" step="0.1" onchange="upd(${idx},'taxPct',+this.value)" style="color:var(--yellow);"></td>
@@ -1536,12 +1666,18 @@ function updListingType(idx, type) {
   renderProducts();
 }
 
-function changeSellerLevel(level) {
-  localStorage.setItem('precify-seller-level', level);
-  const disc = (SELLER_LEVEL[level] || SELLER_LEVEL.normal).discount;
-  const info = document.getElementById('sellerDiscountInfo');
-  if (info) info.textContent = disc > 0 ? `−${disc}pp na comissao` : '';
-  products.forEach(p => recalcProduct(p));
+function updCategory(idx, catKey) {
+  products[idx].category = catKey;
+  recalcProduct(products[idx]);
+  renderProducts();
+}
+
+function changeCategory(catKey) {
+  localStorage.setItem('precify-category', catKey);
+  const cat = ML_CATEGORIES[catKey] || ML_CATEGORIES[DEFAULT_CATEGORY];
+  const info = document.getElementById('categoryFeeInfo');
+  if (info) info.textContent = `C: ${cat.classico}% | P: ${cat.premium}%`;
+  products.forEach(p => { p.category = catKey; recalcProduct(p); });
   renderProducts();
   calcFees();
   calcIdealPrice();
@@ -1574,10 +1710,10 @@ async function loadMyItems() {
       products.push({
         name: item.title || '', id: item.id, link: item.permalink || '',
         catalog: item.catalog || 'NO', soldTotal: item.soldTotal, salesMonth: salesPerMonth, sales: salesPerMonth,
-        price: item.price || 0, listingType: 'premium', mlFee: 16, fixedFee: 6, taxPct: gTax,
+        price: item.price || 0, listingType: 'premium', mlFee: getCategoryFee(DEFAULT_CATEGORY,'premium'), fixedFee: 6, taxPct: gTax,
         weight: 0, frete: 0, net: 0, sellerBa: 'YES', cog: 0, supplLink: '',
         profit: 0, margin: 0, roii: 0, days: item.days || 0, roi: 0,
-        goal: '', ean: item.gtin || '',
+        goal: '', ean: item.gtin || '', category: DEFAULT_CATEGORY,
         visits30d: item.visits30d || 0,
       });
       added++;
@@ -1658,7 +1794,8 @@ function resetPortfolio() {
 
 function addProduct() {
   const gTax = +(document.getElementById('globalTax')?.value || 6);
-  products.push({ name:'Novo Produto', id:'', link:'', catalog:'NO', soldTotal:0, salesMonth:0, sales:0, price:0, listingType:'premium', mlFee:16, fixedFee:6, taxPct:gTax, weight:0, frete:0, net:0, sellerBa:'', cog:0, supplLink:'', profit:0, margin:0, roii:0, days:0, roi:0, goal:'', ean:'' });
+  const defCat = document.getElementById('globalCategory')?.value || DEFAULT_CATEGORY;
+  products.push({ name:'Novo Produto', id:'', link:'', catalog:'NO', soldTotal:0, salesMonth:0, sales:0, price:0, listingType:'premium', mlFee:getCategoryFee(defCat,'premium'), fixedFee:6, taxPct:gTax, weight:0, frete:0, net:0, sellerBa:'', cog:0, supplLink:'', profit:0, margin:0, roii:0, days:0, roi:0, goal:'', ean:'', category:defCat });
   renderProducts();
 }
 
@@ -1752,8 +1889,10 @@ function updateStats() {
 // ============================================================
 function calcFees() {
   const price = pv('calc_price');
-  const lt = ML_LISTING[document.getElementById('calc_listing_type').value] || ML_LISTING.premium;
-  const commission = Math.max(0, lt.fee - getSellerDiscount()) / 100;
+  const ltType = document.getElementById('calc_listing_type').value || 'premium';
+  const calcCat = document.getElementById('calc_category')?.value || document.getElementById('globalCategory')?.value || DEFAULT_CATEGORY;
+  const commissionPct = getCategoryFee(calcCat, ltType);
+  const commission = commissionPct / 100;
   const shipping = pv('calc_shipping');
   const fixed = mlFixedFee(price);
   const tax = pv('calc_tax') / 100;
@@ -1771,10 +1910,8 @@ function calcFees() {
   const roii = totalCost > 0 ? (profit / totalCost) * 100 : 0;
   const roi = (days > 0 && totalCost > 0) ? (profit / totalCost) * (30 / days) : 0;
 
-  const disc = getSellerDiscount();
-  const discLabel = disc > 0 ? ` <span style="color:var(--purple);font-size:0.7rem;">(−${disc}pp)</span>` : '';
   document.getElementById('feeResult').innerHTML = `
-    <div class="item"><div class="lbl">Comissao ML ${discLabel}</div><div class="val" style="color:var(--red)">${fmtR(commissionVal)} <span style="font-size:0.7rem;color:var(--text3);">(${fmtPct(commission*100)})</span></div></div>
+    <div class="item"><div class="lbl">Comissao ML</div><div class="val" style="color:var(--red)">${fmtR(commissionVal)} <span style="font-size:0.7rem;color:var(--text3);">(${fmtPct(commissionPct)})</span></div></div>
     <div class="item"><div class="lbl">Taxa Fixa</div><div class="val" style="color:var(--red)">${fmtR(fixed)}</div></div>
     <div class="item"><div class="lbl">Imposto</div><div class="val" style="color:var(--orange)">${fmtR(taxVal)}</div></div>
     <div class="item"><div class="lbl">Total Taxas</div><div class="val" style="color:var(--red)">${fmtR(totalFees)}</div></div>
@@ -1790,8 +1927,9 @@ function calcFees() {
 function calcIdealPrice() {
   const cost = pv('sim_cost');
   const marginTarget = pv('sim_margin') / 100;
-  const ltSim = ML_LISTING[document.getElementById('sim_listing_type').value] || ML_LISTING.premium;
-  const commission = Math.max(0, ltSim.fee - getSellerDiscount()) / 100;
+  const simLtType = document.getElementById('sim_listing_type').value || 'premium';
+  const simCat = document.getElementById('sim_category')?.value || document.getElementById('globalCategory')?.value || DEFAULT_CATEGORY;
+  const commission = getCategoryFee(simCat, simLtType) / 100;
   const tax = pv('sim_tax') / 100;
   const shipping = pv('sim_shipping');
 
@@ -2078,11 +2216,11 @@ async function processBatchLinks() {
         name: data.title || 'Produto ' + data.id,
         id: data.id || '', link: data.link || links[i],
         catalog: data.catalog || 'NO', soldTotal: data.sales || 0, salesMonth: 0, sales: 0,
-        price: data.price || 0, listingType: 'premium', mlFee: ML_LISTING.premium.fee, fixedFee: ML_LISTING.premium.fixed,
+        price: data.price || 0, listingType: 'premium', mlFee: getCategoryFee(DEFAULT_CATEGORY,'premium'), fixedFee: 6,
         taxPct: +(document.getElementById('globalTax')?.value || 6), frete: sellerFrete, net: 0, sellerBa: '',
         cog: 0, supplLink: '', profit: 0, margin: 0, roii: 0,
         days: data.publishedDays || 0, roi: 0,
-        goal: data.freeShipping ? 'Frete gratis' : '', ean: data.gtin || '',
+        goal: data.freeShipping ? 'Frete gratis' : '', ean: data.gtin || '', category: DEFAULT_CATEGORY,
       });
       added++;
     } catch {}
@@ -2549,7 +2687,7 @@ const TOUR_STEPS = [
   {
     target: null,
     title: 'Dicas de Ouro',
-    text: '<b>&#10003;</b> Preencha o <b>Custo (COG)</b> — sem ele, lucro e ROI ficam zerados<br><b>&#10003;</b> Escolha <b>Premium ou Classico</b> — a comissao muda bastante<br><b>&#10003;</b> Produtos acima de <b>R$79</b> nao pagam taxa fixa<br><b>&#10003;</b> Selecione seu <b>Nivel Vendedor</b> (MercadoLider) pra desconto de ate 2pp<br><b>&#10003;</b> Clique nas colunas para <b>ordenar</b> por qualquer campo',
+    text: '<b>&#10003;</b> Preencha o <b>Custo (COG)</b> — sem ele, lucro e ROI ficam zerados<br><b>&#10003;</b> Escolha <b>Premium ou Classico</b> — a comissao muda bastante<br><b>&#10003;</b> Produtos acima de <b>R$79</b> nao pagam taxa fixa<br><b>&#10003;</b> Clique nas colunas para <b>ordenar</b> por qualquer campo',
     welcome: true
   },
   {
@@ -2664,13 +2802,16 @@ function endTour() {
 // ============================================================
 // INIT
 // ============================================================
-(function restoreSellerLevel() {
-  const saved = localStorage.getItem('precify-seller-level') || 'normal';
-  const sel = document.getElementById('sellerLevel');
-  if (sel) sel.value = saved;
-  const disc = (SELLER_LEVEL[saved] || SELLER_LEVEL.normal).discount;
-  const info = document.getElementById('sellerDiscountInfo');
-  if (info && disc > 0) info.textContent = `−${disc}pp na comissao`;
+(function initCategorySelects() {
+  const opts = getCategoryOptions();
+  const saved = localStorage.getItem('precify-category') || DEFAULT_CATEGORY;
+  ['globalCategory','calc_category','sim_category'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.innerHTML = opts; el.value = saved; }
+  });
+  const cat = ML_CATEGORIES[saved] || ML_CATEGORIES[DEFAULT_CATEGORY];
+  const info = document.getElementById('categoryFeeInfo');
+  if (info) info.textContent = `C: ${cat.classico}% | P: ${cat.premium}%`;
 })();
 initAuth();
 renderProducts();

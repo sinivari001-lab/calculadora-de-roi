@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/api/fees", "destination": "/api/fees" },
+    { "source": "/api/status", "destination": "/api/status" },
+    { "source": "/api/scrape", "destination": "/api/scrape" },
+    { "source": "/api/my-items", "destination": "/api/my-items" }
+  ]
+}
