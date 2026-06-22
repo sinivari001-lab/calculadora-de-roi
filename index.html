@@ -728,6 +728,7 @@ tr.row-loss td:first-child { padding-left: 5px; }
   <button class="tab" onclick="switchTab('whatif')">E se?</button>
   <button class="tab" onclick="switchTab('shipping')">Frete ML</button>
   <button class="tab" onclick="switchTab('goal')">Meta Lucro</button>
+  <button class="tab" onclick="switchTab('rebate')">Rebate</button>
   <button class="tab" onclick="switchTab('suppliers')">Fornecedores</button>
   <button class="tab" onclick="switchTab('competitors')">Concorrentes</button>
 </div>
@@ -1196,6 +1197,53 @@ tr.row-loss td:first-child { padding-left: 5px; }
   </div>
 </div>
 
+<!-- TAB: REBATE SIMULATOR -->
+<div id="tab-rebate" class="tab-content">
+  <div class="fee-panel">
+    <h3>Simulador de Rebate / Desconto</h3>
+    <p style="font-size:0.78rem;color:var(--text2);margin-bottom:12px;">Simule o impacto de dar desconto no preco. Veja quanto sua margem cai e quantas vendas a mais precisa pra compensar.</p>
+    <div class="fee-grid">
+      <div class="field">
+        <label>Preco Original R$</label>
+        <input type="number" id="rb_price" value="89" step="0.01" oninput="calcRebate()">
+      </div>
+      <div class="field">
+        <label>Custo (COG) R$</label>
+        <input type="number" id="rb_cog" value="30" step="0.01" oninput="calcRebate()">
+      </div>
+      <div class="field">
+        <label>Categoria</label>
+        <select id="rb_category" onchange="calcRebate()"></select>
+      </div>
+      <div class="field">
+        <label>Tipo Anuncio</label>
+        <select id="rb_listing" onchange="calcRebate()">
+          <option value="premium">Premium</option>
+          <option value="classico">Classico</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Imposto %</label>
+        <input type="number" id="rb_tax" value="6" step="0.1" oninput="calcRebate()">
+      </div>
+      <div class="field">
+        <label>Frete Vendedor R$</label>
+        <input type="number" id="rb_frete" value="0" step="0.01" oninput="calcRebate()">
+      </div>
+      <div class="field">
+        <label>Vendas Atuais / Mes</label>
+        <input type="number" id="rb_units" value="30" step="1" oninput="calcRebate()">
+      </div>
+    </div>
+    <div style="margin:20px 0;">
+      <label style="font-size:0.78rem;color:var(--text2);">Desconto: <span id="rb_pct_label" style="color:var(--orange);font-weight:700;font-size:1.1rem;">10%</span></label>
+      <input type="range" id="rb_pct" min="1" max="50" value="10" step="1" oninput="calcRebate()" style="width:100%;margin-top:8px;accent-color:var(--orange);">
+      <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--text3);"><span>1%</span><span>50%</span></div>
+    </div>
+    <div id="rbResult" class="fee-breakdown" style="margin-top:16px;"></div>
+  </div>
+</div>
+
 <!-- TAB: SUPPLIERS -->
 <div id="tab-suppliers" class="tab-content">
   <div class="toolbar">
@@ -1218,9 +1266,14 @@ tr.row-loss td:first-child { padding-left: 5px; }
     <div style="display:flex;align-items:center;gap:10px;">
       <span style="font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;background:linear-gradient(135deg,#00e5b0,#00c99a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Mural de Atualizacoes</span>
     </div>
-    <span style="font-size:0.68rem;font-weight:700;padding:3px 10px;border-radius:6px;background:rgba(0,229,176,0.12);color:var(--accent);letter-spacing:0.5px;">v1.6.0</span>
+    <span style="font-size:0.68rem;font-weight:700;padding:3px 10px;border-radius:6px;background:rgba(0,229,176,0.12);color:var(--accent);letter-spacing:0.5px;">v1.7.0</span>
   </div>
   <div style="max-height:300px;overflow-y:auto;font-size:0.75rem;line-height:1.8;">
+    <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(42,42,62,0.3);">
+      <span style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:0.65rem;min-width:72px;">22/06/26</span>
+      <span style="color:var(--green);font-weight:700;font-size:0.6rem;min-width:40px;">NOVO</span>
+      <span style="color:var(--text2);">Simulador de Rebate &mdash; slider de desconto (1-50%) com impacto na margem e vendas extras necessarias pra compensar</span>
+    </div>
     <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(42,42,62,0.3);">
       <span style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:0.65rem;min-width:72px;">22/06/26</span>
       <span style="color:var(--green);font-weight:700;font-size:0.6rem;min-width:40px;">NOVO</span>
@@ -3078,12 +3131,93 @@ function calcGoal() {
 }
 
 // ============================================================
+// REBATE SIMULATOR
+// ============================================================
+function calcRebate() {
+  const price = +document.getElementById('rb_price').value || 0;
+  const cog = +document.getElementById('rb_cog').value || 0;
+  const cat = document.getElementById('rb_category')?.value || DEFAULT_CATEGORY;
+  const lt = document.getElementById('rb_listing').value || 'premium';
+  const tax = (+document.getElementById('rb_tax').value || 0) / 100;
+  const frete = +document.getElementById('rb_frete').value || 0;
+  const currentUnits = +document.getElementById('rb_units').value || 1;
+  const pct = +document.getElementById('rb_pct').value || 10;
+
+  document.getElementById('rb_pct_label').textContent = pct + '%';
+
+  const commRate = getCategoryFee(cat, lt) / 100;
+
+  function calcProfit(p) {
+    const comm = p * commRate;
+    const fixed = mlFixedFee(p);
+    const txVal = p * tax;
+    return p - comm - fixed - txVal - frete - cog;
+  }
+
+  const profitBefore = calcProfit(price);
+  const newPrice = price * (1 - pct / 100);
+  const profitAfter = calcProfit(newPrice);
+  const marginBefore = price > 0 ? (profitBefore / price) * 100 : 0;
+  const marginAfter = newPrice > 0 ? (profitAfter / newPrice) * 100 : 0;
+  const profitLoss = profitBefore - profitAfter;
+  const monthProfitBefore = profitBefore * currentUnits;
+  const monthProfitAfter = profitAfter * currentUnits;
+
+  const unitsNeeded = profitAfter > 0 ? Math.ceil(monthProfitBefore / profitAfter) : 0;
+  const extraUnits = unitsNeeded - currentUnits;
+  const extraPct = currentUnits > 0 ? ((extraUnits / currentUnits) * 100).toFixed(0) : 0;
+
+  const isViable = profitAfter > 0;
+  const compensates = isViable && unitsNeeded > 0;
+
+  document.getElementById('rbResult').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div style="background:rgba(42,42,62,0.5);border-radius:8px;padding:14px;text-align:center;">
+        <div style="font-size:0.65rem;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Preco Original</div>
+        <div style="font-size:1.3rem;font-weight:700;color:var(--text1);">${fmtR(price)}</div>
+        <div style="font-size:0.75rem;color:var(--green);margin-top:4px;">Lucro: ${fmtR(profitBefore)}</div>
+        <div style="font-size:0.68rem;color:var(--text3);">Margem: ${fmtPct(marginBefore)}</div>
+      </div>
+      <div style="background:rgba(255,165,0,0.08);border:1px solid rgba(255,165,0,0.25);border-radius:8px;padding:14px;text-align:center;">
+        <div style="font-size:0.65rem;color:var(--orange);text-transform:uppercase;margin-bottom:4px;">Com ${pct}% Desconto</div>
+        <div style="font-size:1.3rem;font-weight:700;color:var(--orange);">${fmtR(newPrice)}</div>
+        <div style="font-size:0.75rem;color:${isViable?'var(--green)':'var(--red)'};margin-top:4px;">Lucro: ${fmtR(profitAfter)}</div>
+        <div style="font-size:0.68rem;color:var(--text3);">Margem: ${fmtPct(marginAfter)}</div>
+      </div>
+    </div>
+    <div class="item" style="background:${isViable?'rgba(255,165,0,0.08)':'rgba(255,71,87,0.12)'};border-radius:6px;padding:8px;">
+      <div class="lbl" style="font-weight:700;">Perda por Unidade</div>
+      <div class="val" style="color:var(--red);font-weight:700;">-${fmtR(profitLoss)}</div>
+    </div>
+    <div class="item"><div class="lbl">Lucro Mensal ANTES (${currentUnits} un.)</div><div class="val" style="color:var(--green);font-weight:700;">${fmtR(monthProfitBefore)}</div></div>
+    <div class="item"><div class="lbl">Lucro Mensal DEPOIS (${currentUnits} un.)</div><div class="val" style="color:${monthProfitAfter>0?'var(--orange)':'var(--red)'};font-weight:700;">${fmtR(monthProfitAfter)}</div></div>
+    ${!isViable ? '<div class="item" style="background:rgba(255,71,87,0.12);border-radius:6px;padding:8px;"><div class="lbl" style="font-weight:700;color:var(--red);">PREJUIZO!</div><div class="val" style="color:var(--red);">Desconto inviavel — lucro negativo</div></div>' : ''}
+    ${compensates ? `
+    <div style="margin-top:12px;background:rgba(108,92,231,0.08);border:1px solid rgba(108,92,231,0.2);border-radius:8px;padding:14px;">
+      <div style="font-size:0.72rem;color:var(--text3);text-transform:uppercase;margin-bottom:6px;">Para Manter o Mesmo Lucro Mensal</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
+        <div style="text-align:center;">
+          <div style="font-size:1.6rem;font-weight:700;color:var(--purple);">${unitsNeeded}</div>
+          <div style="font-size:0.68rem;color:var(--text3);">vendas/mes</div>
+        </div>
+        <div style="font-size:1.2rem;color:var(--text3);">→</div>
+        <div style="text-align:center;">
+          <div style="font-size:1.2rem;font-weight:700;color:var(--orange);">+${extraUnits} un. (+${extraPct}%)</div>
+          <div style="font-size:0.68rem;color:var(--text3);">vendas extras necessarias</div>
+        </div>
+      </div>
+      <div style="margin-top:8px;font-size:0.72rem;color:var(--text3);">Receita necessaria: ${fmtR(unitsNeeded * newPrice)}</div>
+    </div>` : ''}
+  `;
+}
+
+// ============================================================
 // INIT
 // ============================================================
 (function initCategorySelects() {
   const opts = getCategoryOptions();
   const saved = localStorage.getItem('precify-category') || DEFAULT_CATEGORY;
-  ['globalCategory','calc_category','sim_category','wi_category'].forEach(id => {
+  ['globalCategory','calc_category','sim_category','wi_category','rb_category'].forEach(id => {
     const el = document.getElementById(id);
     if (el) { el.innerHTML = opts; el.value = saved; }
   });
@@ -3097,6 +3231,7 @@ calcFees();
 calcIdealPrice();
 calcWhatIf();
 calcShipping();
+calcRebate();
 checkApi();
 </script>
 </body>
