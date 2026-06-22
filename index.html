@@ -725,6 +725,9 @@ tr.row-loss td:first-child { padding-left: 5px; }
 <div class="tabs">
   <button class="tab active" onclick="switchTab('products')">Produtos</button>
   <button class="tab" onclick="switchTab('calculator')">Calculadora de Taxas</button>
+  <button class="tab" onclick="switchTab('whatif')">E se?</button>
+  <button class="tab" onclick="switchTab('shipping')">Frete ML</button>
+  <button class="tab" onclick="switchTab('goal')">Meta Lucro</button>
   <button class="tab" onclick="switchTab('suppliers')">Fornecedores</button>
   <button class="tab" onclick="switchTab('competitors')">Concorrentes</button>
 </div>
@@ -1071,6 +1074,128 @@ tr.row-loss td:first-child { padding-left: 5px; }
   </div>
 </div>
 
+<!-- TAB: WHAT-IF SIMULATOR -->
+<div id="tab-whatif" class="tab-content">
+  <div class="fee-panel">
+    <h3>Simulador &ldquo;E se?&rdquo;</h3>
+    <p style="font-size:0.78rem;color:var(--text2);margin-bottom:12px;">Arraste o slider de preco e veja lucro, margem e unidades necessarias mudando em tempo real.</p>
+    <div class="fee-grid">
+      <div class="field">
+        <label>Nome do Produto</label>
+        <input type="text" id="wi_name" value="Meu Produto" style="width:100%;">
+      </div>
+      <div class="field">
+        <label>Custo (COG) R$</label>
+        <input type="number" id="wi_cog" value="25" step="0.01" oninput="calcWhatIf()">
+      </div>
+      <div class="field">
+        <label>Categoria</label>
+        <select id="wi_category" onchange="calcWhatIf()" style="font-size:0.75rem;"></select>
+      </div>
+      <div class="field">
+        <label>Tipo Anuncio</label>
+        <select id="wi_listing" onchange="calcWhatIf()">
+          <option value="premium">Premium</option>
+          <option value="classico">Classico</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Imposto %</label>
+        <input type="number" id="wi_tax" value="6" step="0.1" oninput="calcWhatIf()">
+      </div>
+      <div class="field">
+        <label>Frete Vendedor R$</label>
+        <input type="number" id="wi_frete" value="0" step="0.01" oninput="calcWhatIf()">
+      </div>
+    </div>
+    <div style="margin:20px 0;">
+      <label style="font-size:0.78rem;color:var(--text2);">Preco de Venda: <span id="wi_price_label" style="color:var(--accent);font-weight:700;font-size:1.1rem;">R$ 60,00</span></label>
+      <input type="range" id="wi_price" min="10" max="500" value="60" step="1" oninput="calcWhatIf()" style="width:100%;margin-top:8px;accent-color:var(--accent);">
+      <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--text3);"><span>R$ 10</span><span>R$ 500</span></div>
+    </div>
+    <div class="fee-result" id="wiResult"></div>
+    <div style="margin-top:16px;padding:12px;background:rgba(0,229,176,0.06);border:1px solid rgba(0,229,176,0.15);border-radius:8px;">
+      <p style="font-size:0.75rem;color:var(--text2);margin:0;">Pra lucrar <input type="number" id="wi_goal" value="3000" step="100" style="width:70px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 5px;color:var(--accent);font-weight:700;text-align:center;" oninput="calcWhatIf()"> R$/mes, voce precisa vender <span id="wi_units" style="color:var(--accent);font-weight:700;font-size:1rem;">-</span> unidades/mes</p>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: SHIPPING CALCULATOR -->
+<div id="tab-shipping" class="tab-content">
+  <div class="fee-panel">
+    <h3>Calculadora de Frete ML</h3>
+    <p style="font-size:0.78rem;color:var(--text2);margin-bottom:12px;">Estime o custo de frete que o Mercado Livre cobra do vendedor baseado no peso e dimensoes.</p>
+    <div class="fee-grid">
+      <div class="field">
+        <label>Peso Real (kg)</label>
+        <input type="number" id="sh_weight" value="0.5" step="0.01" min="0.01" oninput="calcShipping()">
+      </div>
+      <div class="field">
+        <label>Comprimento (cm)</label>
+        <input type="number" id="sh_length" value="30" step="1" oninput="calcShipping()">
+      </div>
+      <div class="field">
+        <label>Largura (cm)</label>
+        <input type="number" id="sh_width" value="20" step="1" oninput="calcShipping()">
+      </div>
+      <div class="field">
+        <label>Altura (cm)</label>
+        <input type="number" id="sh_height" value="10" step="1" oninput="calcShipping()">
+      </div>
+      <div class="field">
+        <label>Preco do Produto R$</label>
+        <input type="number" id="sh_price" value="79" step="0.01" oninput="calcShipping()">
+      </div>
+      <div class="field">
+        <label>Tipo Envio</label>
+        <select id="sh_type" onchange="calcShipping()">
+          <option value="full">Full (Mercado Envios)</option>
+          <option value="flex">Flex / Coleta</option>
+          <option value="proprio">Frete Proprio</option>
+        </select>
+      </div>
+    </div>
+    <div class="fee-result" id="shResult"></div>
+    <div style="margin-top:14px;">
+      <h4 style="font-size:0.8rem;color:var(--text2);margin-bottom:8px;">Tabela de Referencia - Frete ML (estimativa)</h4>
+      <div style="overflow-x:auto;">
+        <table class="main" style="min-width:auto;font-size:0.78rem;">
+          <thead><tr><th>Peso Cubado</th><th class="right">Ate R$79</th><th class="right">Acima R$79</th></tr></thead>
+          <tbody>
+            <tr><td>Ate 300g</td><td class="right">R$ 18-22</td><td class="right">R$ 0 (gratis)</td></tr>
+            <tr><td>300g - 1kg</td><td class="right">R$ 22-28</td><td class="right">R$ 0-5</td></tr>
+            <tr><td>1kg - 3kg</td><td class="right">R$ 28-38</td><td class="right">R$ 5-12</td></tr>
+            <tr><td>3kg - 5kg</td><td class="right">R$ 35-48</td><td class="right">R$ 10-18</td></tr>
+            <tr><td>5kg - 10kg</td><td class="right">R$ 45-65</td><td class="right">R$ 15-28</td></tr>
+            <tr><td>10kg - 30kg</td><td class="right">R$ 60-120</td><td class="right">R$ 25-55</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:0.68rem;color:var(--text3);margin-top:6px;">Valores estimados. O frete real varia por regiao, tipo de envio e politicas vigentes do ML. Use o Simulador de Custos oficial do ML para valores exatos.</p>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: PROFIT GOAL -->
+<div id="tab-goal" class="tab-content">
+  <div class="fee-panel">
+    <h3>Meta de Lucro Mensal</h3>
+    <p style="font-size:0.78rem;color:var(--text2);margin-bottom:12px;">Defina quanto quer lucrar por mes e descubra quantas unidades de cada produto precisa vender.</p>
+    <div class="fee-grid">
+      <div class="field">
+        <label>Meta de Lucro Mensal R$</label>
+        <input type="number" id="goal_target" value="5000" step="100" oninput="calcGoal()" style="font-size:1rem;font-weight:700;color:var(--accent);">
+      </div>
+      <div class="field">
+        <label>Dias Trabalhados/Mes</label>
+        <input type="number" id="goal_days" value="26" step="1" oninput="calcGoal()">
+      </div>
+    </div>
+    <div id="goalResult" style="margin-top:16px;"></div>
+    <p style="font-size:0.72rem;color:var(--text3);margin-top:12px;">Os calculos usam os produtos da aba Produtos. Adicione produtos com custo (COG) preenchido para ver as metas.</p>
+  </div>
+</div>
+
 <!-- TAB: SUPPLIERS -->
 <div id="tab-suppliers" class="tab-content">
   <div class="toolbar">
@@ -1093,13 +1218,28 @@ tr.row-loss td:first-child { padding-left: 5px; }
     <div style="display:flex;align-items:center;gap:10px;">
       <span style="font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;background:linear-gradient(135deg,#00e5b0,#00c99a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Mural de Atualizacoes</span>
     </div>
-    <span style="font-size:0.68rem;font-weight:700;padding:3px 10px;border-radius:6px;background:rgba(0,229,176,0.12);color:var(--accent);letter-spacing:0.5px;">v1.5.0</span>
+    <span style="font-size:0.68rem;font-weight:700;padding:3px 10px;border-radius:6px;background:rgba(0,229,176,0.12);color:var(--accent);letter-spacing:0.5px;">v1.6.0</span>
   </div>
   <div style="max-height:300px;overflow-y:auto;font-size:0.75rem;line-height:1.8;">
     <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(42,42,62,0.3);">
+      <span style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:0.65rem;min-width:72px;">22/06/26</span>
+      <span style="color:var(--green);font-weight:700;font-size:0.6rem;min-width:40px;">NOVO</span>
+      <span style="color:var(--text2);">Simulador &ldquo;E se?&rdquo; &mdash; slider de preco em tempo real com calculo de lucro, margem e unidades necessarias pra bater meta</span>
+    </div>
+    <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(42,42,62,0.3);">
+      <span style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:0.65rem;min-width:72px;">22/06/26</span>
+      <span style="color:var(--green);font-weight:700;font-size:0.6rem;min-width:40px;">NOVO</span>
+      <span style="color:var(--text2);">Calculadora de Frete ML &mdash; peso cubado automatico, estimativa de custo por tipo de envio (Full, Flex, Proprio)</span>
+    </div>
+    <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(42,42,62,0.3);">
+      <span style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:0.65rem;min-width:72px;">22/06/26</span>
+      <span style="color:var(--green);font-weight:700;font-size:0.6rem;min-width:40px;">NOVO</span>
+      <span style="color:var(--text2);">Meta de Lucro Mensal &mdash; defina quanto quer lucrar e veja quantas unidades de cada produto precisa vender</span>
+    </div>
+    <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(42,42,62,0.3);">
       <span style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:0.65rem;min-width:72px;">20/06/26</span>
       <span style="color:var(--green);font-weight:700;font-size:0.6rem;min-width:40px;">NOVO</span>
-      <span style="color:var(--text2);">Taxas por categoria ML &mdash; 6 faixas reais de comissao (11% a 19%) aplicadas automaticamente na calculadora, simulador e tabela de produtos</span>
+      <span style="color:var(--text2);">Taxas por categoria ML &mdash; 38 categorias com comissao real (11% a 19%) por produto</span>
     </div>
     <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(42,42,62,0.3);">
       <span style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:0.65rem;min-width:72px;">19/06/26</span>
@@ -2800,12 +2940,150 @@ function endTour() {
 }
 
 // ============================================================
+// WHAT-IF SIMULATOR
+// ============================================================
+function calcWhatIf() {
+  const price = +document.getElementById('wi_price').value;
+  const cog = +document.getElementById('wi_cog').value || 0;
+  const cat = document.getElementById('wi_category')?.value || DEFAULT_CATEGORY;
+  const lt = document.getElementById('wi_listing').value || 'premium';
+  const tax = (+document.getElementById('wi_tax').value || 0) / 100;
+  const frete = +document.getElementById('wi_frete').value || 0;
+  const goal = +document.getElementById('wi_goal').value || 0;
+
+  document.getElementById('wi_price_label').textContent = fmtR(price);
+
+  const commPct = getCategoryFee(cat, lt);
+  const comm = price * commPct / 100;
+  const fixed = mlFixedFee(price);
+  const taxVal = price * tax;
+  const totalFees = comm + fixed + taxVal + frete;
+  const net = price - totalFees;
+  const profit = net - cog;
+  const margin = price > 0 ? (profit / price) * 100 : 0;
+  const roii = cog > 0 ? (profit / cog) * 100 : 0;
+  const unitsNeeded = profit > 0 ? Math.ceil(goal / profit) : 0;
+
+  document.getElementById('wi_units').textContent = profit > 0 ? unitsNeeded + ' un.' : 'impossivel (prejuizo)';
+
+  const profitColor = profit >= 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('wiResult').innerHTML = `
+    <div class="item"><div class="lbl">Comissao ML (${fmtPct(commPct)})</div><div class="val" style="color:var(--red)">${fmtR(comm)}</div></div>
+    <div class="item"><div class="lbl">Taxa Fixa</div><div class="val" style="color:var(--red)">${fmtR(fixed)}</div></div>
+    <div class="item"><div class="lbl">Imposto</div><div class="val" style="color:var(--orange)">${fmtR(taxVal)}</div></div>
+    <div class="item"><div class="lbl">Frete</div><div class="val" style="color:var(--red)">${fmtR(frete)}</div></div>
+    <div class="item"><div class="lbl">Total Taxas</div><div class="val" style="color:var(--red)">${fmtR(totalFees)}</div></div>
+    <div class="item"><div class="lbl">Liquido</div><div class="val">${fmtR(net)}</div></div>
+    <div class="item"><div class="lbl">Custo (COG)</div><div class="val" style="color:var(--yellow)">${fmtR(cog)}</div></div>
+    <div class="item" style="background:${profit>=0?'rgba(0,229,176,0.08)':'rgba(255,71,87,0.08)'};border-radius:6px;padding:6px 8px;"><div class="lbl" style="font-weight:700;">Lucro por Unidade</div><div class="val" style="color:${profitColor};font-size:1.1rem;font-weight:700;">${fmtR(profit)}</div></div>
+    <div class="item"><div class="lbl">Margem</div><div class="val">${fmtPct(margin)}</div></div>
+    <div class="item"><div class="lbl">ROII</div><div class="val">${fmtPct(roii)}</div></div>
+    ${profit > 0 ? '<div class="item"><div class="lbl">Receita necessaria/mes</div><div class="val" style="color:var(--blue)">' + fmtR(unitsNeeded * price) + '</div></div>' : ''}
+  `;
+}
+
+// ============================================================
+// SHIPPING CALCULATOR
+// ============================================================
+function calcShipping() {
+  const weight = +document.getElementById('sh_weight').value || 0.5;
+  const length = +document.getElementById('sh_length').value || 30;
+  const width = +document.getElementById('sh_width').value || 20;
+  const height = +document.getElementById('sh_height').value || 10;
+  const price = +document.getElementById('sh_price').value || 79;
+  const type = document.getElementById('sh_type').value;
+
+  const cubicWeight = (length * width * height) / 6000;
+  const billedWeight = Math.max(weight, cubicWeight);
+  const isFreeShipping = price >= 79;
+
+  let estimatedCost = 0;
+  if (type === 'full') {
+    if (billedWeight <= 0.3) estimatedCost = isFreeShipping ? 0 : 20;
+    else if (billedWeight <= 1) estimatedCost = isFreeShipping ? 3 : 25;
+    else if (billedWeight <= 3) estimatedCost = isFreeShipping ? 8 : 33;
+    else if (billedWeight <= 5) estimatedCost = isFreeShipping ? 14 : 42;
+    else if (billedWeight <= 10) estimatedCost = isFreeShipping ? 22 : 55;
+    else estimatedCost = isFreeShipping ? 40 : 90;
+  } else if (type === 'flex') {
+    estimatedCost = isFreeShipping ? 5 : 15;
+    if (billedWeight > 5) estimatedCost += (billedWeight - 5) * 3;
+  } else {
+    estimatedCost = 0;
+  }
+
+  document.getElementById('shResult').innerHTML = `
+    <div class="item"><div class="lbl">Peso Real</div><div class="val">${weight.toFixed(2)} kg</div></div>
+    <div class="item"><div class="lbl">Volume</div><div class="val">${(length * width * height / 1000).toFixed(1)} L (${length}×${width}×${height} cm)</div></div>
+    <div class="item"><div class="lbl">Peso Cubado</div><div class="val" style="color:${cubicWeight>weight?'var(--yellow)':'var(--text2)'}">${cubicWeight.toFixed(2)} kg ${cubicWeight>weight?'(maior que real!)':''}</div></div>
+    <div class="item" style="background:rgba(0,229,176,0.08);border-radius:6px;padding:6px 8px;"><div class="lbl" style="font-weight:700;">Peso Cobrado (maior entre real e cubado)</div><div class="val" style="font-weight:700;color:var(--accent);">${billedWeight.toFixed(2)} kg</div></div>
+    <div class="item"><div class="lbl">Frete Gratis pro Comprador?</div><div class="val" style="color:${isFreeShipping?'var(--green)':'var(--red)'};">${isFreeShipping?'Sim (produto >= R$79)':'Nao (produto < R$79)'}</div></div>
+    <div class="item" style="background:rgba(108,92,231,0.08);border-radius:6px;padding:6px 8px;"><div class="lbl" style="font-weight:700;">Custo Estimado pro Vendedor</div><div class="val" style="font-weight:700;color:var(--purple);font-size:1.1rem;">${type==='proprio'?'Voce define':fmtR(estimatedCost)}</div></div>
+    ${type!=='proprio'?'<div class="item"><div class="lbl">Impacto no Lucro (por unidade)</div><div class="val" style="color:var(--red);">−${fmtR(estimatedCost)}</div></div>':''}
+  `;
+}
+
+// ============================================================
+// PROFIT GOAL
+// ============================================================
+function calcGoal() {
+  const target = +document.getElementById('goal_target').value || 0;
+  const days = +document.getElementById('goal_days').value || 26;
+  const dailyTarget = target / days;
+
+  const prods = products.filter(p => p.cog > 0 && p.profit > 0);
+  if (prods.length === 0) {
+    document.getElementById('goalResult').innerHTML = '<p style="color:var(--text3);font-size:0.8rem;">Nenhum produto com custo (COG) e lucro positivo. Adicione produtos na aba Produtos.</p>';
+    return;
+  }
+
+  const rows = prods.map(p => {
+    const unitsMonth = Math.ceil(target / p.profit);
+    const unitsDay = (target / p.profit / days).toFixed(1);
+    const revenue = unitsMonth * p.price;
+    const capital = unitsMonth * p.cog;
+    return `<tr>
+      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(p.name)}</td>
+      <td class="right mono">${fmtR(p.price)}</td>
+      <td class="right mono" style="color:var(--green);">${fmtR(p.profit)}</td>
+      <td class="right mono" style="color:var(--accent);font-weight:700;">${unitsMonth}</td>
+      <td class="right mono">${unitsDay}/dia</td>
+      <td class="right mono" style="color:var(--blue);">${fmtR(revenue)}</td>
+      <td class="right mono" style="color:var(--yellow);">${fmtR(capital)}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('goalResult').innerHTML = `
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;">
+      <div style="background:rgba(0,229,176,0.08);border:1px solid rgba(0,229,176,0.2);border-radius:8px;padding:12px 16px;flex:1;min-width:140px;">
+        <div style="font-size:0.68rem;color:var(--text3);text-transform:uppercase;">Meta Mensal</div>
+        <div style="font-size:1.2rem;font-weight:700;color:var(--accent);">${fmtR(target)}</div>
+      </div>
+      <div style="background:rgba(0,180,216,0.08);border:1px solid rgba(0,180,216,0.2);border-radius:8px;padding:12px 16px;flex:1;min-width:140px;">
+        <div style="font-size:0.68rem;color:var(--text3);text-transform:uppercase;">Meta Diaria (${days} dias)</div>
+        <div style="font-size:1.2rem;font-weight:700;color:var(--blue);">${fmtR(dailyTarget)}</div>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="main" style="min-width:auto;font-size:0.78rem;">
+        <thead><tr>
+          <th>Produto</th><th class="right">Preco</th><th class="right">Lucro/Un.</th>
+          <th class="right">Un./Mes</th><th class="right">Ritmo</th>
+          <th class="right">Receita</th><th class="right">Capital</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ============================================================
 // INIT
 // ============================================================
 (function initCategorySelects() {
   const opts = getCategoryOptions();
   const saved = localStorage.getItem('precify-category') || DEFAULT_CATEGORY;
-  ['globalCategory','calc_category','sim_category'].forEach(id => {
+  ['globalCategory','calc_category','sim_category','wi_category'].forEach(id => {
     const el = document.getElementById(id);
     if (el) { el.innerHTML = opts; el.value = saved; }
   });
@@ -2817,6 +3095,8 @@ initAuth();
 renderProducts();
 calcFees();
 calcIdealPrice();
+calcWhatIf();
+calcShipping();
 checkApi();
 </script>
 </body>
